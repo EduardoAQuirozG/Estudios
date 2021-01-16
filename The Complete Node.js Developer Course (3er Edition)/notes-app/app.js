@@ -40,8 +40,7 @@ yargs.command({
         }
     },
     handler: function(argv) {
-        log(chalk.white.inverse.bold('Title:'), argv.title)
-        log(chalk.white.inverse.bold('Body:'), argv.body)
+        notes.addNote(argv.title, argv.body)
     }
 })
 
@@ -49,8 +48,15 @@ yargs.command({
 yargs.command({
     command: 'remove', 
     describe: 'Remove a note', 
-    handler: function() {
-        log(chalk.red.bold('Removing the note'))
+    builder: {
+        title: {
+            describe: 'Remove title', 
+            demandOption: true, 
+            type: 'string'
+        }
+    },
+    handler: function(argv) {
+        notes.removeNote(argv.title)
     }
 })
 
