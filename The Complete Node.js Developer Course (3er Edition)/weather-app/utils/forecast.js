@@ -3,6 +3,7 @@ const request = require('postman-request')
 // weatherstack.com API
 const weatherstack_accessKey = '';
 
+// Get the forecast
 const forecast = (latitude, longitude, callback) => {
     const weatherstack_url = 'http://api.weatherstack.com/current?access_key=' + weatherstack_accessKey + '&query=' + latitude + ',' + longitude + '&units=f'
 
