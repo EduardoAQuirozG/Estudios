@@ -10,7 +10,7 @@ const log = console.log;
 // console.log("Is URL?", validator.isURL('http/udemy.com'))
 
 // log(chalk.red.bold.inverse("Error!"))
-//log(process.argv)
+// log(process.argv)
 
 // const command = process.argv[2];
 
@@ -39,7 +39,7 @@ yargs.command({
             type: 'string'
         }
     },
-    handler: function(argv) {
+    handler(argv) {
         notes.addNote(argv.title, argv.body)
     }
 })
@@ -50,12 +50,12 @@ yargs.command({
     describe: 'Remove a note', 
     builder: {
         title: {
-            describe: 'Remove title', 
+            describe: 'Note title', 
             demandOption: true, 
             type: 'string'
         }
     },
-    handler: function(argv) {
+    handler(argv) {
         notes.removeNote(argv.title)
     }
 })
@@ -64,8 +64,8 @@ yargs.command({
 yargs.command({
     command: 'list',
     describe: 'List your notes', 
-    handler: function() {
-        log(chalk.yellow.bold('Listing out all notes!'))
+    handler() {
+        notes.listNotes()
     }
 })
 
@@ -73,8 +73,15 @@ yargs.command({
 yargs.command({
     command: 'read', 
     describe: 'Read a note', 
-    handler: function() {
-        log(chalk.blue.inverse.bold('Reading a note!'))
+    builder: {
+        title: {
+            describe: 'Note title', 
+            demandOption: true, 
+            type: 'string'
+        }
+    },
+    handler(argv) {
+        notes.readNote(argv.title)
     }
 })
 
