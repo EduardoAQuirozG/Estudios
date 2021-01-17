@@ -2,21 +2,25 @@ const geocode = require('./utils/geocode.js')
 const forecast = require('./utils/forecast.js')
 
 const log = console.log;
+const address = process.argv[2]
 
-// Get the geocode
-geocode('Aguascalientes', (error, data) => {
-    if(error) {
-        log('Error', error)
-    } else {
-        log('Data', data)
-    }
-})
+if (address){
+    // Get the geocode
+    geocode(address, (error, {latitude, longitude, location} = {}) => {
+        if(error) {
+            return log('Error', error)
+        }
 
-// Get the forecast
-forecast(44.1545, -75.7088, (error, data) => {
-    if(error) {
-        log('Error', error)
-    } else {
-        log('Data', data)
-    }
-})
+        // Get the forecast
+        forecast(latitude, longitude, (error, forecastData) => {
+            if(error) {
+                return log('Error', error)
+            }
+            
+            log(location)
+            log(forecastData)
+        })
+    })
+} else {
+    log('Error', 'No address was provided.')
+}
