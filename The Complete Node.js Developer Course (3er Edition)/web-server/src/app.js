@@ -36,7 +36,7 @@ app.use(express.static(publicDirectoryPath))
 // localhost with dynamic template
 app.get('', (req, res) => {
     res.render('index', {
-        title: 'Home', 
+        title: 'Weather', 
         name: 'Eduardo Quiroz'
     })
 })
