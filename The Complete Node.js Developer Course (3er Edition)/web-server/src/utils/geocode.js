@@ -1,7 +1,7 @@
 const request = require('postman-request')
 
 // mapbox.com API
-const mapbox_accessToken = ''
+const mapbox_accessToken = 'pk.eyJ1IjoiZWR1YXJkb2FxdWlyb3pnIiwiYSI6ImNrazByanpqazBjdmoycnBqOWkwcmR3MHEifQ.DGv-_60EOONUWhHLYSq55A'
 
 // Get the geocode
 const geocode = (address, callback) => {
