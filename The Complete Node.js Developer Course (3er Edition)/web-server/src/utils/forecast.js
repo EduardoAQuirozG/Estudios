@@ -1,7 +1,7 @@
 const request = require('postman-request')
 
 // weatherstack.com API
-const weatherstack_accessKey = 'd8ad5c9bd14b3ff5ab3e5f86ac06f247';
+const weatherstack_accessKey = '';
 
 // Get the forecast
 const forecast = (latitude, longitude, callback) => {
