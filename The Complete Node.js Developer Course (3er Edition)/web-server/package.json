@@ -1,17 +1,29 @@
 {
   "name": "web-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Weather App developed in Node.js using the studies of \"The Complete Node.js Developer Course (3er Edition)\"",
   "main": "index.js",
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js -e hbs,js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Eduardo Quiroz",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
     "hbs": "^4.0.1",
     "postman-request": "^2.88.1-postman.28"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^1.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EduardoAQuirozG/weather-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/EduardoAQuirozG/weather-app/issues"
+  },
+  "homepage": "https://github.com/EduardoAQuirozG/weather-app#readme"
 }
