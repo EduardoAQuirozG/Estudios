@@ -20,6 +20,7 @@ const partialsPath = path.join(__dirname, '..', 'templates', 'partials')
 // log(publicDirectoryPath)
 
 const app = express()
+const port = process.env.PORT || 3000
 
 // Dynamic templates
 // Setup handlebars (hbs) engine
@@ -136,6 +137,6 @@ app.get('*', (req, res) => {
 })
 
 // Server is waiting and listening to any petition
-app.listen(3000, () => {
-    console.log('Server is up on port 3000.')
+app.listen(port, () => {
+    console.log('Server is up on port ' + port + '.')
 })
