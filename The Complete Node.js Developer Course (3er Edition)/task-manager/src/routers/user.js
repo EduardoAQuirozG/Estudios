@@ -8,8 +8,22 @@ router.post('/users', async (req, res) => {
 
     try {
         await user.save()
-        res.status(201).send(user)
-    } catch (exception) {
+        const token = await user.generateAuthToken()
+        res.status(201).send({ user, token })
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+
+// POST for creating the login system
+router.post('/users/login', async (req, res) => {
+    const _body = req.body
+
+    try {
+        const user = await User.findByCredentials(_body.email, _body.password)
+        const token = await user.generateAuthToken()
+        res.send({ user, token })
+    } catch (error) {
         res.status(400).send(error)
     }
 })
@@ -55,14 +69,21 @@ router.patch('/users/:id', async (req, res) => {
     }
 
     try {
-        const user = await User.findByIdAndUpdate(
-            _id, 
-            _body, 
-            { new: true, runValidators: true})
+        const user = await User.findById(_id)
 
         if (!user){
             res.status(404).send()
         }
+
+        updates.forEach((update) => user[update] = _body[update])
+
+        await user.save()
+
+        // Este tipo de update no pasa por el schema de save
+        // const user = await User.findByIdAndUpdate(
+        //     _id, 
+        //     _body, 
+        //     { new: true, runValidators: true})
 
         res.send(user)
     } catch (error) {
