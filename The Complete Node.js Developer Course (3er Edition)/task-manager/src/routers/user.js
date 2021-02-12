@@ -16,7 +16,7 @@ router.post('/users', async (req, res) => {
     }
 })
 
-// POST for creating the login system
+// POST for creating the login token of the user
 router.post('/users/login', async (req, res) => {
     const _body = req.body
 
@@ -26,6 +26,36 @@ router.post('/users/login', async (req, res) => {
         res.send({ user, token })
     } catch (error) {
         res.status(400).send(error)
+    }
+})
+
+// POST for login out and removing the token
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        const _user = req.user 
+        _user.tokens = _user.tokens.filter(token => {
+            return token.token !== req.token
+        });
+
+        await _user.save();
+
+        res.status(200).send('You have logged out correctly.')
+    } catch (error) {
+        res.status(500).send({ error })
+    }
+})
+
+// POST for login out all the users with there own tokens
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        const _user = req.user
+        _user.tokens = [];
+
+        await _user.save();
+
+        res.status(200).send('You have logged out from all sessions correctly.')
+    } catch (error) {
+        res.status(500).send({ error })
     }
 })
 
