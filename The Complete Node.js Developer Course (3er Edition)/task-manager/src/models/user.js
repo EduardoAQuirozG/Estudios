@@ -3,6 +3,8 @@ const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+const Task = require('./task')
+
 // We create the user Schema
 const userSchema = new mongoose.Schema({
     name: {
@@ -50,6 +52,14 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+// We create a virtual relation
+userSchema.virtual('tasks', {
+    ref: 'Task', 
+    localField: '_id',
+    foreignField: 'owner'
+})
+
+// We create methods that can be called as extensions
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({ _id: user._id.toString() }, 'thisismynewcourse')
@@ -94,6 +104,15 @@ userSchema.pre('save', async function (next) {
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
     }
+
+    next()
+})
+
+// Delete user tasks when user is removed
+userSchema.pre('remove', async function (next) {
+    const user = this
+
+    await Task.deleteMany({ owner: user._id })
 
     next()
 })
