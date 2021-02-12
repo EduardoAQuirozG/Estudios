@@ -1,4 +1,5 @@
 const express = require('express')
+const auth = require('../middleware/auth')
 const router = new express.Router()
 const User = require('../models/user')
 
@@ -29,13 +30,8 @@ router.post('/users/login', async (req, res) => {
 })
 
 // GET for getting a list of users
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.find({})
-        res.send(users)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+router.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
 
 // GET for getting a single user using dynamic link
