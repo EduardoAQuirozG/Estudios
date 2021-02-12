@@ -1,6 +1,21 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
+
+// Without middleware: new request -> run route handler
+// With middleware: new request -> do something -> run route handler
+// app.use((req, res, next) => {
+//     if (req.method === 'GET') {
+//         res.status(400).send('GET requests are disabled')
+//     } else {
+//         next()
+//     }
+// })
+
+// app.use((req, res, next) => {
+//     res.status(503).send('The server is under maintenance.')
+// })
+
 //We check the authorization to validate that the token is correct and exists
 const auth = async (req, res, next) => {
     try {
