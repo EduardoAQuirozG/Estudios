@@ -31,8 +31,9 @@ router.post('/users/login', async (req, res) => {
 
 // POST for login out and removing the token
 router.post('/users/logout', auth, async (req, res) => {
+    const _user = req.user 
+
     try {
-        const _user = req.user 
         _user.tokens = _user.tokens.filter(token => {
             return token.token !== req.token
         });
@@ -47,13 +48,14 @@ router.post('/users/logout', auth, async (req, res) => {
 
 // POST for login out all the users with there own tokens
 router.post('/users/logoutAll', auth, async (req, res) => {
+    const _user = req.user
+
     try {
-        const _user = req.user
         _user.tokens = [];
 
         await _user.save();
 
-        res.status(200).send('You have logged out from all sessions correctly.')
+        res.status(200).send(_user)
     } catch (error) {
         res.status(500).send({ error })
     }
@@ -65,26 +67,25 @@ router.get('/users/me', auth, async (req, res) => {
 })
 
 // GET for getting a single user using dynamic link
-router.get('/users/:id', async (req, res) => {
-    const _id = req.params.id
+// router.get('/users/:id', async (req, res) => {
+//     const _id = req.params.id
 
-    try {
-        const user = await User.findById(_id)
+//     try {
+//         const user = await User.findById(_id)
 
-        if (!user){
-            return res.status(404).send()
-        }
-        res.send(user)
-    } catch (error) {
-        res.status(500).send(error)
-    }
-})
+//         if (!user){
+//             return res.status(404).send()
+//         }
+//         res.send(user)
+//     } catch (error) {
+//         res.status(500).send(error)
+//     }
+// })
 
 //PATCH for updating a single user, validating that everything is correct
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
     const allowedUpdates = ['name', 'email', 'password', 'age']
     
-    const _id = req.params.id
     const _body = req.body
     const updates = Object.keys(_body)
 
@@ -94,16 +95,18 @@ router.patch('/users/:id', async (req, res) => {
         return res.status(400).send({ error: 'Invalid updates!' })
     }
 
+    const _user = req.user
+
     try {
-        const user = await User.findById(_id)
+        // const user = await User.findById(_id)
 
-        if (!user){
-            res.status(404).send()
-        }
+        // if (!user){
+        //     res.status(404).send()
+        // }
+        
+        updates.forEach((update) => _user[update] = _body[update])
 
-        updates.forEach((update) => user[update] = _body[update])
-
-        await user.save()
+        await _user.save()
 
         // Este tipo de update no pasa por el schema de save
         // const user = await User.findByIdAndUpdate(
@@ -111,23 +114,26 @@ router.patch('/users/:id', async (req, res) => {
         //     _body, 
         //     { new: true, runValidators: true})
 
-        res.send(user)
+        res.send(_user)
     } catch (error) {
         res.status(500).send(error)
     }
 })
 
 //DELETE for deleting information in database
-router.delete('/users/:id', async (req, res) => {
-    const _id = req.params.id
+router.delete('/users/me', auth, async (req, res) => {
+    const _user = req.user
+
     try {
-        const user = await User.findByIdAndDelete(_id)
+        // const user = await User.findByIdAndDelete(_id)
 
-        if (!user) {
-            return res.statusCode(404).send()
-        }
+        // if (!user) {
+        //     return res.statusCode(404).send()
+        // }
 
-        res.send(user)
+        await _user.remove()
+
+        res.send(_user)
     } catch (error) {
         res.status(500).send(error)
     }
