@@ -1,7 +1,34 @@
+//We load the defined libraries
 const express = require('express')
+const multer = require('multer') //used to upload documents
+const sharp = require('sharp') //used to resize and change the format of an image
+
+//We load personalized libraries
+const { sendWelcomeEmail, sendCancelationEmail } = require('../emails/account')
+
+//We load the middleware authentication
 const auth = require('../middleware/auth')
-const router = new express.Router()
+
+//We load the schemas
 const User = require('../models/user')
+
+//We load the router
+const router = new express.Router()
+
+//We load the file upload configuration
+const upload = multer({
+    //dest: 'avatar', We use this to assign a place to save, unless you are going to use another point 
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+            cb(new Error('The file is not an image.'))
+        }
+
+        cb(undefined, true)
+    }
+})
 
 // POST for creating a new user
 router.post('/users', async (req, res) => {
@@ -9,7 +36,7 @@ router.post('/users', async (req, res) => {
 
     try {
         await user.save()
-
+        sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken()
 
         res.status(201).send({ user, token })
@@ -135,6 +162,7 @@ router.delete('/users/me', auth, async (req, res) => {
         // }
 
         await _user.remove()
+        sendCancelationEmail(_user.email, _user.name)
 
         res.send(_user)
     } catch (error) {
@@ -142,5 +170,56 @@ router.delete('/users/me', auth, async (req, res) => {
     }
 })
 
+//POST to upload an avatar from the user
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
+    const _user = req.user;
+    const _avatarBuffer = req.file.buffer
+
+    try {
+        const buffer = await sharp(_avatarBuffer)
+            .resize({ width: 250, height: 250 })
+            .png()
+            .toBuffer();
+
+        _user.avatar = buffer
+        await _user.save();
+
+        res.send();
+    } catch (error) {
+        res.status(500).send({ Error: error })
+    }
+}, (error, req, res, next) => {
+    res.status(400).send({ Error: error.message })
+})
+
+//DELETE to delete the avatar image from the user
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    const _user = req.user
+
+    try {
+        _user.avatar = undefined
+        await _user.save()
+
+        res.send()
+    } catch (e) {
+        res.status(500).send({ Error: error })
+    }
+})
+
+//GET to get the user avatar by the id provided
+router.get('/users/:id/avatar', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+
+        if (!user || !user.avatar) {
+            throw new Error('No image was found')
+        }
+
+        res.set('Content-Type', 'image/png')
+        res.send(user.avatar)
+    } catch (error) {
+        res.status(404).send()
+    }
+})
 
 module.exports = router
